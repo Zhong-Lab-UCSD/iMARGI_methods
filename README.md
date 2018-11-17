@@ -15,12 +15,6 @@ In this repository, we introduce the data processing methods (tools and usages) 
             - [2.5.1. `.pairs` format](#251-pairs-format)
             - [2.5.2. BEDPE format](#252-bedpe-format)
     - [3. Further analysis tips](#3-further-analysis-tips)
-        - [3.1. Gene annotation using BEDOPS](#31-gene-annotation-using-bedops)
-        - [3.2. Analyze in R](#32-analyze-in-r)
-    - [2.2. Tools](#22-tools)
-    - [3.1. CT filtering](#31-ct-filtering)
-    - [3.2. Mapping](#32-mapping)
-    - [3.3. Pair parse and filter](#33-pair-parse-and-filter)
 
 ## 1. Tools and data dependencies
 
@@ -34,12 +28,12 @@ Make sure that all the required tools are installed on your linux system with co
 - [bwa](https://github.com/lh3/bwa) (version 0.7.17)
 - [pairtools](https://github.com/mirnylab/pairtools) (version 0.2.0)
 - [samtools](http://www.htslib.org/download/) (version 1.9)
-- [seqtk]
-- [pbgzip]
+- [seqtk](https://github.com/lh3/seqtk) (version 1.3)
+- [pbgzip](https://github.com/nh13/pbgzip)
 - [GNU parallel](https://www.gnu.org/software/parallel/)
 - [ct_clean_pefastq.sh](./ct_clean_pefastq.sh): provided in this repository. Put it in your exec path and `chmod +x`,
    or specify directory when you use it.
-- [pairs_to_bedpe.sh](): provided in this repository. Put it in your exec path and `chmod +x`, or specify directory
+- [pairs_to_bedpe.sh](./pairs_to_bedpe.sh): provided in this repository. Put it in your exec path and `chmod +x`, or specify directory
    when you use it.
 - [GNU awk](https://www.gnu.org/software/gawk/manual/html_node/Quick-Installation.html): most of Linux distributions
   have GNU awk default installed.
@@ -224,55 +218,28 @@ You can read its [specification document](https://github.com/4dn-dcic/pairix/blo
 
 #### 2.5.2. BEDPE format
 
-We also provide a script tool [`pairs_to_bedpe.sh`](./pairs_to_bedpe.sh) to convert the output `.pairs` format to BEDPE
-format. If you want to know more about BEDPE format, please read the
+We also provide a script tool [`pairs_to_bedpe.sh`](./pairs_to_bedpe.sh) to convert the output the gzip compressed
+`.pairs` format file to a gzip compressed BEDPE format file. **The pairs format file must include cigar columns**.
+If you want to know more about BEDPE format, please read the
 [docs of bedtools](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format).
 
-
-
-
-
+``` bash
+bash pairs_to_bedpe.sh \
+    -i ./pairs_output/final_HEK_iMARGI.pairs.gz \
+    -o ./pairs_output/final_HEK_iMARGI.bedpe.gz
+```
 
 ## 3. Further analysis tips
 
-### 3.1. Gene annotation using BEDOPS
+According to iMARGI library construction design, the RNA end (Read 1) is reverse strand specific. It means that when
+you annotate the RNA end with gene annotations, you need to reverse the strand, i.e., "+" -> "-" and "-" -> "+".
+The DNA end (Read 2) is not strand specific.
 
-### 3.2. Analyze in R
+Many tools can be used to annotate, such as bedtools and BEDOPS. But you need to write some scripts to annotate RNA
+end and DNA end separately.
 
-
-
-
-
-## 2.2. Tools
-
-- CT filtering: ct_clean_pair.sh => fastq.gz
-- Mapping: bwa mem => bam
-- Pair parse: pairtools and pairix => `bedpe` and `bedpe.gz`(pairix indexed)
-- Gene (RNA end) annotation: BEDOPS bedmap => `bedpe` and `bedpe.gz`
-- Generate RNA-DNA interaction matrix: cooler => `.cool`
-- Generate GIVE interaction format => GIVE-Toolbox => `.giveX`
-- Visualization: higlass and GIVE
-- Distributed pipeline: Docker and nextflow
-
-## 3.1. CT filtering
-
-According to the iMARGI design, the correct first 2 bases in the DNA end must be "CT". So we can remove those read pairs not started with "CT" in DNA end. We created a bash script tool `ct_clean_pair.sh` to do CT filtering. 
-- Dependencies: seqtk, zcat, awk, parallel
-- Input: `fastq.gz` files of R1 and R2
-- Output: The clean `fastq.gz` files and the drop `fastq.gz` files. The first 2 bases of DNA end (R2) were removed in both clean and drop `fastq.gz` files.
-- Parallelization: Support `-t`
-``` bash
-bash ct_clean_pair.sh -1 fastq/HEK293library5_WW_S1_L007_R1_001.fastq.gz -2 fastq/HEK293library5_WW_S1_L007_R2_001.fastq.gz -o ./output/ -t 16 -b 4000000 
-```
-## 3.2. Mapping
-Following the standard 4DN HiC pipeline, use bwa with -SP5M parameters.
-- Dependencies: bwa, samtools
-- Input: `fastq.gz` files of R1 and R2
-- Output: `.bam` files
--Parallelization: Support `-t`
-```
-bwa index -p ref/bwa_index/bwa_index_GRCh38 GRCh38_no_alt_analysis_set_GCA_000001405.15.fa
-nohup bash -c "bwa mem -t 16 -SP5M ref/bwa_index/bwa_index_GRCh38 output/clean_HEK293library5_WW_S1_L007_R1_001.fastq.gz output/clean_HEK293library5_WW_S1_L007_R2_001.fastq.gz | samtools view -Shb -@ 16 - >output/clean_HEK.bam" >log/bwa_clean_HEK.log & 
-```
-## 3.3. Pair parse and filter
-Use pairtools to do pair parsing, which includes several sub-processes, `parse`, `sort`, `dedup`, `split`, `select` and `pairix`
+If you are using R, you can try to use Bioconductor packages
+[GenomicRanges](http://bioconductor.org/packages/release/bioc/html/GenomicRanges.html),
+[GenomicInteractions](http://bioconductor.org/packages/release/bioc/html/GenomicInteractions.html), and
+[InteractionSet](http://bioconductor.org/packages/release/bioc/html/InteractionSet.html), which will help you do more
+analysis not only annotation.
