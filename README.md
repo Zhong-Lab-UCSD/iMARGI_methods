@@ -92,7 +92,7 @@ The first 2 bases (5' end) of RNA end (Read 1) are random nucleotides, which nee
 The first 2 bases (5' end) of DNA end (Read 2) must be "CT" for correct ligation of RNA and DNA fragments. So we will
 filter our the read pairs without "CT" as the first two bases of DNA end (Read 2).
 
-We use the bash script `ct_clean_pefastq.sh` to clean the paired fastq files. We can use one command line to do that.
+We use the bash script [`ct_clean_pefastq.sh`](./ct_clean_pefastq.sh) to clean the paired fastq files. We can use one command line to do that.
 The `-t` and `-b` parameters are used for parallel computing, which means use 16 CPU cores and read in 4 million read
 pairs each time in each CPU core. You need to adjust the parameters based on you machine configurations.
 
