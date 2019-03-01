@@ -1,20 +1,29 @@
 # iMARGI Data Processing Methods
 
+**Deprecated**: We have created a powerful Docker image, iMARGI-Docker to deliver the data processing pipeline of
+iMARGI. Please refer to the software GitHub repo and a full documentation.
+
+- **[iMARGI-Docker GitHub repository](https://github.com/Zhong-Lab-UCSD/iMARGI-Docker)**
+
+- **[Full documentation of iMARGI pipeline](https://sysbio.ucsd.edu/imargi_pipeline)**
+
+---
+
 In this repository, we introduce the data processing methods (tools and usages) of iMARGI, from fastq to RNA-DNA interaction map.
 
 - [iMARGI Data Processing Methods](#imargi-data-processing-methods)
-    - [1. Tools and data dependencies](#1-tools-and-data-dependencies)
-        - [1.1. Required tools](#11-required-tools)
-        - [1.2. Reference data](#12-reference-data)
-    - [2. Data processing](#2-data-processing)
-        - [2.1. Input data and directory](#21-input-data-and-directory)
-        - [2.2. Fastq file cleaning](#22-fastq-file-cleaning)
-        - [2.3. Mapping](#23-mapping)
-        - [2.4. Pair parsing, de-duplication and filtering](#24-pair-parsing-de-duplication-and-filtering)
-        - [2.5. Multiple output formats](#25-multiple-output-formats)
-            - [2.5.1. `.pairs` format](#251-pairs-format)
-            - [2.5.2. BEDPE format](#252-bedpe-format)
-    - [3. Further analysis tips](#3-further-analysis-tips)
+  - [1. Tools and data dependencies](#1-tools-and-data-dependencies)
+    - [1.1. Required tools](#11-required-tools)
+    - [1.2. Reference data](#12-reference-data)
+  - [2. Data processing](#2-data-processing)
+    - [2.1. Input data and directory](#21-input-data-and-directory)
+    - [2.2. Fastq file cleaning](#22-fastq-file-cleaning)
+    - [2.3. Mapping](#23-mapping)
+    - [2.4. Pair parsing, de-duplication and filtering](#24-pair-parsing-de-duplication-and-filtering)
+    - [2.5. Multiple output formats](#25-multiple-output-formats)
+      - [2.5.1. `.pairs` format](#251-pairs-format)
+      - [2.5.2. BEDPE format](#252-bedpe-format)
+  - [3. Further analysis tips](#3-further-analysis-tips)
 
 ## 1. Tools and data dependencies
 
